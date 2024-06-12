@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Push Notifications</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+9Auv242fFZg9826556aVqeoQv033FSob9JIIPxuw81+t06kMe/1q4M4+PG" crossorigin="anonymous">
+  <style>
+    body {
+      background-color: #f7f7f7;
+      color: #333;
+    }
+
+    .container {
+      max-width: 500px;
+      padding: 30px;
+      margin: auto;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    p {
+      font-size: 1.2rem;
+      line-height: 1.5rem;
+    }
+
+    #subscribe-button {
+      background-color: #4f46e5;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #user-id {
+      font-size: 1.2rem;
+      line-height: 1.5rem;
+      background-color: #eee;
+      padding: 10px;
+      margin-top: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      p {
+        font-size: 1rem;
+        line-height: 1.2rem;
+      }
+
+      #subscribe-button {
+        font-size: 1rem;
+        padding: 8px 16px;
+      }
+
+      #user-id {
+        font-size: 1rem;
+        line-height: 1.2rem;
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Web Push Notifications</h1>
+    <p>Click the button below to subscribe to notifications.</p>
+    <button id="subscribe-button" class="btn btn-primary">Subscribe</button>
+
+    <div id="user-id"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJBazHLgAR1aNwEn1Pv0JE69AiqB5pVH3yBC/9dTiDi" crossorigin="anonymous"></script>
+  <script>
+    const subscribeButton = document.getElementById('subscribe-button');
+    const userIdElement = document.getElementById('user-id');
+
+    subscribeButton.addEventListener('click', async () => {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: 'BPgVZ8INMzQp48_jn6-98EOvgDpEYnKf1Bye--9l5G_es4pMH1XXKpp0e2hZp06LJOXT8bRKiHN5IZVlRpiPOoo'
+      });
+
+      await fetch('http://79.137.204.229:2228/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(subscription)
+      });
+
+      userIdElement.textContent = `Your user ID: ${subscription.endpoint}`;
+    });
+  </script>
+</body>
+</html>
